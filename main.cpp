@@ -58,10 +58,10 @@ bool isLeft(node *current, vrchol *ciel) {
     }
 }
 
-int traversal(int velkost, vrchol *graf){
+void traversal(int velkost, vrchol *graf){
     std::priority_queue<struct node*, std::vector<struct node*>, Comparator> fronta;
     struct node *tmp = (node *) malloc(sizeof(struct node));
-    int visited[200][200][4] = {};
+    int visited[velkost][velkost][4] = {};
     tmp->cena=0;
     tmp->x=0;
     tmp->y=0;
