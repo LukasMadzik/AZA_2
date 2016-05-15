@@ -5,12 +5,13 @@
 //#include <algorithm>
 //#include <cstring>
 //#include <functional>
-
+#include <ctime>
 
 #include <iostream>
 #include <vector>
 #include <queue>
 #include <stdlib.h>
+#include <string.h>
 
 #define UP 0
 #define RIGHT 1
@@ -20,9 +21,11 @@
 
 using namespace std;
 
+int velkost;
+
 struct vrchol {
     int x=0, y=0;
-    struct vrchol *deti[4];
+    struct vrchol *deti[4] = {NULL,NULL,NULL,NULL};
     int cesty[4] = {-1,-1,-1,-1};
 };
 
@@ -58,10 +61,12 @@ bool isLeft(node *current, vrchol *ciel) {
     }
 }
 
-void traversal(int velkost, vrchol *graf){
+void traversal(vrchol *graf){
+
     std::priority_queue<struct node*, std::vector<struct node*>, Comparator> fronta;
     struct node *tmp = (node *) malloc(sizeof(struct node));
-    int visited[velkost][velkost][4] = {};
+    int visited[velkost][velkost][4];
+    memset(visited, 0, sizeof(int)*velkost*velkost*4);
     tmp->cena=0;
     tmp->x=0;
     tmp->y=0;
@@ -72,7 +77,8 @@ void traversal(int velkost, vrchol *graf){
     while (!(tmp->y == velkost-1 && tmp->x == velkost-1)){
         for (int j = 0; j < 4; j++) {
             struct node *tmp2 = (node *) malloc(sizeof(struct node));
-            if(visited[tmp->y][tmp->x][j]==0) {
+            if(graf[tmp->x+tmp->y*velkost].deti[j]!=NULL){
+            //if(visited[tmp->y][tmp->x][j]==0) {
                 if (graf[tmp->x + tmp->y * velkost].cesty[j] != -1) {
                     if (tmp->parent == NULL || graf[tmp->x + tmp->y * velkost].deti[j]->y != tmp->parent->y ||
                         graf[tmp->x + tmp->y * velkost].deti[j]->x != tmp->parent->x) {
@@ -91,13 +97,25 @@ void traversal(int velkost, vrchol *graf){
         }
         tmp=fronta.top();
         fronta.pop();
+        if(tmp->x == tmp->parent->x){
+            if(tmp->y > tmp->parent->y){
+                graf[tmp->parent->x+tmp->parent->y*velkost].deti[DOWN]=NULL;
+            } else {
+                graf[tmp->parent->x+tmp->parent->y*velkost].deti[UP]=NULL;
+            }
+        } else {
+            if(tmp->x > tmp->parent->x){
+                graf[tmp->parent->x+tmp->parent->y*velkost].deti[RIGHT]=NULL;
+            } else {
+                graf[tmp->parent->x+tmp->parent->y*velkost].deti[LEFT]=NULL;
+            }
+        }
     }
     cout << tmp->cena << endl;
 
 }
 
 void start(){
-    int velkost;
     cin >> velkost;
     struct vrchol graf[velkost][velkost];
     graf[0][0].x = 0;
@@ -127,13 +145,16 @@ void start(){
             }
         }
     }
-    traversal(velkost,(struct vrchol *)graf);
+    int start_s = clock();
+    traversal((struct vrchol *)graf);
+    int stop_s = clock();
+    cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC)*1000 << endl;
 }
 
 int main() {
     int vstupov;
     cin >> vstupov;
-    for (int i = 0; i < vstupov; ++i) {
+    for (int i = 0; i < vstupov; i++) {
         start();
     }
     return 0;
